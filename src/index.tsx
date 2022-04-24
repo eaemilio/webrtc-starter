@@ -4,15 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { FirebaseAppProvider, SuspenseWithPerf } from 'reactfire';
-
-const firebaseConfig = {
-    apiKey: 'AIzaSyDVhS0LI3OAtraVQtq3lVEDwZ8KkrGMsC0',
-    authDomain: 'webrtc-7d954.firebaseapp.com',
-    projectId: 'webrtc-7d954',
-    storageBucket: 'webrtc-7d954.appspot.com',
-    messagingSenderId: '949895648096',
-    appId: '1:949895648096:web:df2a4e83406c46c4bac405',
-};
+import firebaseConfig from './firebase-config.json';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
