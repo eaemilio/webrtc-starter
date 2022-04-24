@@ -4,7 +4,9 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { FirebaseAppProvider, SuspenseWithPerf } from 'reactfire';
-import firebaseConfig from './firebase-config.json';
+import { Buffer } from 'buffer';
+
+const firebaseConfig = JSON.parse(Buffer.from(process.env.REACT_APP_FIREBASE_CONFIG ?? '', 'base64').toString());
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
