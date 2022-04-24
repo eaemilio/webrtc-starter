@@ -1,0 +1,1 @@
+export const DEFAULT_ROOM = 'oxZpjT6CZ3jBU9iFNQyF';
