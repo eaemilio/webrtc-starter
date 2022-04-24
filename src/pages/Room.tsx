@@ -42,38 +42,21 @@ function Room(): JSX.Element {
         await createAnswer();
     };
 
+    /**
+     * Gets local media and remote media.
+     */
     const setTracks = async (): Promise<void> => {
         // TODO: Get local media
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        addLocalTracks(stream);
-        if (localVideo.current) {
-            localVideo.current.srcObject = stream;
-            localVideo.current.volume = 0;
-        }
-
         // TODO: Handle peer connection ontrack
-        peerConnection.ontrack = (event) => {
-            setRemoteJoined(true);
-            const remoteStream = new MediaStream();
-            const track = event.track;
-
-            if (remoteVideo.current) {
-                remoteStream.addTrack(track);
-                remoteVideo.current.srcObject = remoteStream;
-            }
-        };
     };
 
+    /**
+     * onicecandidate event is triggered after setting the local description.
+     * Saves the candidates into the offer/answer candidates doc.
+     * @param isHost if the current user created the room
+     */
     const handleOfferCandidates = (isHost = false): void => {
         // TODO: handle onicecandidate
-        peerConnection.onicecandidate = async (event) => {
-            const candidates = event?.candidate?.toJSON();
-            if (candidates) {
-                await updateDoc(isHost ? offerCandidatesDoc : answerCandidatesDoc, {
-                    candidates: arrayUnion(candidates),
-                });
-            }
-        };
     };
 
     /**
@@ -83,71 +66,30 @@ function Room(): JSX.Element {
      */
     const addLocalTracks = (stream: MediaStream): void => {
         // TODO: Add local tracks to peer connection
-        stream.getTracks().forEach((track) => peerConnection.addTrack(track));
     };
 
+    /**
+     * Creates and offer and saves the new offer to the current room doc on Firestore.
+     */
     const createOffer = async (): Promise<void> => {
         // TODO: Create offer and save it on the room doc
-        const offerDescription = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offerDescription);
-
-        const { sdp, type } = offerDescription;
-        const offer = { sdp, type };
-        await setDoc(roomDoc, { offer });
     };
 
+    /**
+     * Handle remote answer and answer candidates from firestore docs.
+     */
     const handleSnapshots = (): void => {
         // TODO: Listen for remote answer
-        onSnapshot(roomDoc, (snapshot) => {
-            const data = snapshot.data() ?? {};
-            const answer = data.answer;
-            if (!peerConnection.remoteDescription && answer) {
-                peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-            }
-        });
-
         // TODO: Handle answer candidates
-        onSnapshot(answerCandidatesDoc, (snapshot) => {
-            const candidates = snapshot.get('candidates');
-            if (!candidates) {
-                return;
-            }
-            candidates.forEach((candidate: RTCIceCandidateInit) => {
-                const iceCandidate = new RTCIceCandidate(candidate);
-                peerConnection.addIceCandidate(iceCandidate);
-            });
-        });
     };
 
+    /**
+     * Creates an answer and sets the remote description for the peer connection
+     */
     const createAnswer = async (): Promise<void> => {
         // TODO: Get offer and set remote description
-        const doc = await getDoc(roomDoc);
-        const data = doc.data();
-
-        if (data?.offer) {
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-        }
-
         // TODO: Create answer and save it to the room doc
-        const answerDescription = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answerDescription);
-
-        const { sdp, type } = answerDescription;
-        const answer = { sdp, type };
-        await updateDoc(roomDoc, { answer });
-
         // TODO: Listen for offer candidates
-        onSnapshot(offerCandidatesDoc, (snapshot) => {
-            const candidates = snapshot.get('candidates');
-            console.log(candidates);
-            if (!candidates) {
-                return;
-            }
-            candidates.forEach((candidate: RTCIceCandidateInit) => {
-                const iceCandidate = new RTCIceCandidate(candidate);
-                peerConnection.addIceCandidate(iceCandidate);
-            });
-        });
     };
 
     return (
