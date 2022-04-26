@@ -35,7 +35,7 @@
 
 1. After you have a Firebase project, you can register your web app with that project.
 
-2. In the center of the Firebase console's project overview page, click the Web icon (plat_web) to launch the setup workflow.
+2. In the center of the Firebase console's project overview page, click the Web icon to launch the setup workflow.
 
 3. If you've already added an app to your Firebase project, click Add app to display the platform options.
 
